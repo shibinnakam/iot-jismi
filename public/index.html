@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESP32 Anti-Theft Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101820;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { color: #00ff99; }
+    .card {
+      background: #1e2a38;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 255, 150, 0.3);
+      margin: 20px auto;
+      width: 300px;
+    }
+    .timestamp { color: #aaa; }
+    table {
+      border-collapse: collapse;
+      margin: 20px auto;
+      width: 80%;
+    }
+    th, td {
+      border: 1px solid #00ff99;
+      padding: 8px;
+    }
+    th {
+      background: #00ff99;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>ESP32 Anti-Theft Dashboard</h1>
+  <div class="card">
+    <h3 id="status">Loading...</h3>
+    <p id="vibration"></p>
+    <p class="timestamp" id="time"></p>
+  </div>
+
+  <h2>Recent Alerts</h2>
+  <table id="historyTable">
+    <thead>
+      <tr><th>Time</th><th>Message</th><th>Vibration</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchData() {
+      const res = await fetch("/data");
+      const data = await res.json();
+      if (data) {
+        document.getElementById("status").innerText = `Status: ${data.msg}`;
+        document.getElementById("vibration").innerText = `Vibration: ${data.vibA}`;
+        document.getElementById("time").innerText = new Date(data.timestamp).toLocaleString();
+      }
+    }
+
+    async function fetchHistory() {
+      const res = await fetch("/history");
+      const data = await res.json();
+      const tbody = document.querySelector("#historyTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(item => {
+        tbody.innerHTML += `<tr>
+          <td>${new Date(item.timestamp).toLocaleString()}</td>
+          <td>${item.msg}</td>
+          <td>${item.vibA}</td>
+        </tr>`;
+      });
+    }
+
+    fetchData();
+    fetchHistory();
+    setInterval(fetchData, 2000);
+    setInterval(fetchHistory, 10000);
+  </script>
+</body>
+</html>
