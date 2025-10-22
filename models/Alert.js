@@ -1,9 +1,12 @@
 const mongoose = require("mongoose");
 
-const AlertSchema = new mongoose.Schema({
-  msg: { type: String, required: true },
-  vibA: { type: Number, default: 0 },
+const alertSchema = new mongoose.Schema({
+  pir: Number,
+  vibration: Number,
+  vibAnalog: Number,
+  msg: String,
+  ip: String,
   timestamp: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("Alert", AlertSchema);
+module.exports = mongoose.model("Alert", alertSchema);
